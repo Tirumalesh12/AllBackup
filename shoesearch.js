@@ -41,7 +41,7 @@ var search = session.search;
 
 
 // Create bot and add dialogs
-var bot = new builder.BotConnectorBot({ appId: '', appSecret: '' });
+var bot = new builder.BotConnectorBot({ appId: '6f2d84e4-edc5-45c3-9757-dc540a0090d0', appSecret: 'nuNX47d7dzPc02nfkOYyd79' });
 
 var recognizer = new builder.LuisRecognizer('https://api.projectoxford.ai/luis/v2.0/apps/c592677c-d9ec-435d-bada-77008d9fc147?subscription-key=412111898d6f49a0b22467676f123ecb&verbose=true&q=');
 var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
