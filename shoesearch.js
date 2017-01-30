@@ -41,14 +41,15 @@ var search = session.search;
 
 
 // Create bot and add dialogs
-var bot = new builder.BotConnectorBot({ appId: '6f2d84e4-edc5-45c3-9757-dc540a0090d0', appSecret: 'nuNX47d7dzPc02nfkOYyd79' });
+var connector = new builder.ChatConnector({ appId: '6f2d84e4-edc5-45c3-9757-dc540a0090d0', appSecret: 'nuNX47d7dzPc02nfkOYyd79' });
 
 var recognizer = new builder.LuisRecognizer('https://api.projectoxford.ai/luis/v2.0/apps/c592677c-d9ec-435d-bada-77008d9fc147?subscription-key=412111898d6f49a0b22467676f123ecb&verbose=true&q=');
-var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
-bot.add('/', dialog);
+var bot = new builder.UniversalBot(connector);
+var intents = new builder.IntentDialog({ recognizers: [recognizer] });
+bot.dialog('/', intents);
 
 // Handling the Greeting intent. 
-dialog.matches('ShoeSearch', function (session, args, next) {
+intents.matches(!'None', function (session, args, next) {
 	console.log ('in shoesearch intent ');
 	var shoe = builder.EntityRecognizer.findEntity(args.entities, 'Shoe');
 	var gender = builder.EntityRecognizer.findEntity(args.entities, 'Gender');
@@ -64,15 +65,15 @@ dialog.matches('ShoeSearch', function (session, args, next) {
 		type: type ? capitalize(type.entity) : "",
 		size: size ? size.entity : "",
 		data: "",
-		category: ""
+		//category: ""
 		}
-	search.category = choose_cat(search.gender,search.type);
+	//search.category = choose_cat(search.gender,search.type);
 	session.send('Hello there! I am the shoe search bot. You are looking for %s %s %s %s for %s of size %s',search.brand,search.type,search.color,search.shoe,search.gender,search.size);		
     
 	 callingApi = function(callback){
 	     var options = {
             host: 'api.walmartlabs.com',
-            path: "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ search.category +"&facet=on&facet.filter=gender:"+ search.gender +"&facet.filter=color:"+ search.color +"&facet.filter=brand:"+ search.brand +"&facet.filter=shoe_size:"+ search.size +"&format=json&start=1&numItems=10", 
+            path: "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+choose_cat(search.gender,search.type) +"&facet=on&facet.filter=gender:"+ search.gender +"&facet.filter=color:"+ search.color +"&facet.filter=brand:"+ search.brand +"&facet.filter=shoe_size:"+ search.size +"&format=json&start=1&numItems=10", 
             method: 'GET'   
          };
          //this is the call
@@ -89,14 +90,60 @@ dialog.matches('ShoeSearch', function (session, args, next) {
             });
 	      }).end();
      }
-    callingApi(function(data){
-	console.log(data);
+    show_output = function() {callingApi(function(data){
+	console.log(data.items[0].name);
 	session.send(data.items[0].name);
-	});
+	[ function(session) {      
+        var msg = new builder.Message(session)
+            .attachments([
+                new builder.HeroCard(session)
+                    .title(data.items[0].name)
+                    .images([ builder.CardImage.create(session, data.items[0].thumbnailImage) ])
+					.tap(builder.CardAction.openUrl(session, data.items[0].productUrl)),
+                new builder.HeroCard(session)
+                    .title(data.items[1].name)
+                    .images([ builder.CardImage.create(session, data.items[1].thumbnailImage) ])
+					.tap(builder.CardAction.openUrl(session, data.items[1].productUrl)),
+			    new builder.HeroCard(session)
+                    .title(data.items[2].name)
+                    .images([ builder.CardImage.create(session, data.items[2].thumbnailImage) ])
+					.tap(builder.CardAction.openUrl(session, data.items[2].productUrl))
+            ]);
+        session.send(msg);
+    }]
+	})};
+	show_output();
+	while(search.gender==""||search.type==""||search.color==""||search.size==""){
+		if(search.gender==""){
+		    [function (session, results) {
+            builder.Prompts.choice(session, "Please select the gender?",["Men","Women"]);
+		    search.gender = captilize(results.respose.entity);
+		    show_output();
+            }]
+		} else if (search.type==""){
+		   [function (session, results) {
+            builder.Prompts.choice(session, "Please select the type of shoe?",["Formal","Atheletic", "Casual"]);
+		    search.type = captilize(results.respose.entity);
+		    show_output();
+            }]
+		} else if (search.color==""){
+		   [function (session, results) {
+            builder.Prompts.choice(session, "Please select the color of shoe?",["Black","Blue","Brown","White","Red"]);
+		    search.color = captilize(results.respose.entity);
+		    show_output();
+            }]
+		} else if (search.size==""){
+		   [function (session, results) {
+            builder.Prompts.choice(session, "Please select the size of shoe?",["7","8","9","10","11"]);
+		    search.color = captilize(results.respose.entity);
+		    show_output();
+            }]
+		}
+	}
 });
 
 // Handling unrecognized conversations.
-dialog.matches('None', function (session, args) {
+intents.matches('None', function (session, args) {
 	console.log ('in none intent');	
 	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");			
 });
@@ -105,7 +152,7 @@ dialog.matches('None', function (session, args) {
 
 // Setup Restify Server
 var server = restify.createServer();
-server.post('/api/messages', bot.verifyBotFramework(), bot.listen());
-server.listen(process.env.port || 5001, function () {
+server.post('/api/messages', connector.listen());
+server.listen(process.env.port || 5348, function () {
     console.log('%s listening to %s', server.name, server.url); 
 });
