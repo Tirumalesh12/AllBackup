@@ -37,7 +37,7 @@ capitalize = function(str) {
 	return str;
 }
 
-var search = session.search;
+
 
 
 // Create bot and add dialogs
@@ -49,8 +49,9 @@ var intents = new builder.IntentDialog({ recognizers: [recognizer] });
 bot.dialog('/', intents);
 
 // Handling the Greeting intent. 
-intents.matches(!'None', function (session, args, next) {
+intents.matches('ShoeSearch', function (session, args, next) {
 	console.log ('in shoesearch intent ');
+	var search = session.search;
 	var shoe = builder.EntityRecognizer.findEntity(args.entities, 'Shoe');
 	var gender = builder.EntityRecognizer.findEntity(args.entities, 'Gender');
 	var brand = builder.EntityRecognizer.findEntity(args.entities, 'Shoe::Shoe_brand');
@@ -90,7 +91,7 @@ intents.matches(!'None', function (session, args, next) {
             });
 	      }).end();
      }
-    show_output = function() {callingApi(function(data){
+    function show_output() {callingApi(function(data){
 	console.log(data.items[0].name);
 	session.send(data.items[0].name);
 	[ function(session) {      
@@ -140,6 +141,7 @@ intents.matches(!'None', function (session, args, next) {
             }]
 		}
 	}
+	session.end();
 });
 
 // Handling unrecognized conversations.
@@ -148,11 +150,9 @@ intents.matches('None', function (session, args) {
 	session.send("I am sorry! I am a bot, perhaps not programmed to understand this command");			
 });
 
-
-
 // Setup Restify Server
 var server = restify.createServer();
 server.post('/api/messages', connector.listen());
-server.listen(process.env.port || 5348, function () {
+server.listen(process.env.port || 5001, function () {
     console.log('%s listening to %s', server.name, server.url); 
 });
