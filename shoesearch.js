@@ -92,6 +92,7 @@ intents.matches('ShoeSearch', function (session, args, next) {
 	      }).end();
      }
     function show_output() {callingApi(function(data){
+	if(data.items != null) {
 	console.log(data.items[0].name);
 	session.send(data.items[0].name);
 	[ function(session) {      
@@ -112,6 +113,7 @@ intents.matches('ShoeSearch', function (session, args, next) {
             ]);
         session.send(msg);
     }]
+	}else {session.send("Try again, no product exists");}
 	})};
 	show_output();
 	while(search.gender==""||search.type==""||search.color==""||search.size==""){
