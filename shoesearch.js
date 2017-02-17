@@ -2,6 +2,9 @@ var restify = require('restify');
 var builder = require('botbuilder');
 var session = require('client-sessions');
 var https = require('https');
+const config = require('./config/default');
+var name = config.appSecret;
+console.log(name);
 
 var data = "";
 
@@ -110,12 +113,12 @@ dialog.matchesAny(['ShoeSearch','Gender','Type','Color','Brand'] , [
 	session.dialogData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.dialogData.gender,session.dialogData.type) +"&facet=on&facet.filter=gender:"+ session.dialogData.gender +"&facet.filter=color:"+ session.dialogData.color +"&facet.filter=brand:"+ session.dialogData.brand +"&facet.filter=shoe_size:"+ session.dialogData.size +"&format=json&start=1&numItems=10";
     callingApi(session.dialogData.path, function(data){		
 		showoutput(session,data);
-		})
 		builder.Prompts.choice(session, "Please select the gender?",["Men","Women"]);
+		})		
     },
 	function (session,results) {
-		session.dialogData.gender = results.response.entity;
 		console.log(session.dialogData.shoe);
+		session.dialogData.gender = results.response.entity;		
 		session.send(session.dialogData.gender);
 		//search.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(search.gender,search.type) +"&facet=on&facet.filter=gender:"+ search.gender +"&facet.filter=color:"+ search.color +"&facet.filter=brand:"+ search.brand +"&facet.filter=shoe_size:"+ search.size +"&format=json&start=1&numItems=10";
 		callingApi(session.dialogData.path,function(data){
