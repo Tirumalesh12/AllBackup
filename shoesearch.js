@@ -2,7 +2,7 @@ var restify = require('restify');
 var builder = require('botbuilder');
 var session = require('client-sessions');
 var https = require('https');
-const config = require('./config/default');
+const config = require('./default');
 var name = config.appSecret;
 console.log(name);
 
