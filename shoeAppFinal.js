@@ -140,6 +140,7 @@ showoutput = function(session,data){
 				       ])
 				       .buttons([
 					       builder.CardAction.postBack(session, "showitem  "+ parseInt(data.items[i].itemId),"Show item"),
+						   builder.CardAction.postBack(session, "showitem  "+ parseInt(data.items[i].itemId),"Show item")
 				       ])
 				i++;
 				}
@@ -376,7 +377,7 @@ dialog.matches('Size', function (session, args, results) {
 	var size = builder.EntityRecognizer.findEntity(args.entities, 'Shoe::Shoe_size');
 	session.userData.size = size ? deleteSpace(size.entity) : "";
 	session.userData.page = 0;
-	session.send("Wow, Let me see what we have got");
+	session.send("Wow.. ok, I will show you what we have got");
 	if(session.userData.size == "any"){
 			session.userData.path = "/v1/search?apiKey=ve94zk6wmtmkawhde7kvw9b3&query=shoes&categoryId="+ choose_cat(session.userData.gender,session.userData.type) +"&facet=on&facet.filter=gender:"+ session.userData.gender +"&facet.filter=color:"+ session.userData.color +"&facet.filter=brand:"+ session.userData.brand +"&facet.filter=shoe_size:&format=json&start=1&numItems=10";
 	}else {
@@ -705,7 +706,7 @@ bot.dialog('/Brand', [
 ]);
 
 dialog.matches('End Conversation', function (session, args) {
-	session.send("Thank you for checking in, Hope I helped");
+	session.send("Thank you for checking in, Hope I helped you.");
 	session.send("Come back again");
 	session.userData = {
 		shoe:  "",
@@ -717,6 +718,8 @@ dialog.matches('End Conversation', function (session, args) {
 	};
 	session.endDialog();
 })
+
+
 // Setup Restify Server
 var server = restify.createServer();
 server.post('/api/messages', connector.listen());

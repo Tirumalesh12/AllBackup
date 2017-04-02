@@ -71,6 +71,7 @@ capitalize = function(str) {
 	str = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 	return str;
 }
+
 showoutput = function(session,data){
 	session.sendTyping();
 	var i=0;
@@ -95,7 +96,7 @@ showoutput = function(session,data){
 				}
 		if(data.items[9] !== undefined){	
 		card[i] = new builder.HeroCard(session)
-                      .subtitle('Want to see Similar kind of shoes? Click below')
+                      .subtitle('Want to see more Similar kind of shoes?')
                       .buttons([
 					       builder.CardAction.imBack(session, "Show more", "Show more"),
 				       ])
@@ -194,8 +195,7 @@ var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
 bot.dialog('/', dialog);
 
 // Handling the Greeting intent. 
-dialog.matches('ShoeSearch' , 
-    function (session, args, next) {
+dialog.matches('ShoeSearch' , function (session, args, next) {
 	console.log ('in shoesearch intent ');
 	var shoe = builder.EntityRecognizer.findEntity(args.entities, 'Shoe');
 	var gender = builder.EntityRecognizer.findEntity(args.entities, 'Gender');
@@ -259,7 +259,6 @@ dialog.matches('Gender', function (session, args) {
 	}
 	})
 })
-
 
 dialog.matches('Type', function (session, args) {
 	var type = builder.EntityRecognizer.findEntity(args.entities, 'Shoe::Shoe_type');
@@ -345,49 +344,25 @@ dialog.matches('Show more', function (session, args) {
 })
 
 
-dialog.matches('Sample',
+dialog.matches('Link account',
   function (session) {
-	  session.send("in sample intent");
     var message = new builder.Message(session)
       .sourceEvent({
         facebook: {
-           "attachment":{
-            "type":"template",			   
-            "payload": {
-				"template_type": "generic",
-				"elements": [{
-					"title": "Reebok Men's Yourflex Train 7.0 Lmt Training Shoe",
-					"subtitle": "41.11",
-					"image_url": "https://i5.walmartimages.com/asr/c2177e90-3024-4096-a602-3f7563f8c2c9_1.96d3442ce0884e313e06ded4787dea21.jpeg?odnHeight=100&odnWidth=100&odnBg=FFFFFF",
-					"buttons": [{
-						"type": "web_url",
-						"url": "http://c.affil.walmart.com/t/api02?l=http%3A%2F%2Fwww.walmart.com%2Fip%2FReebok-YourFlex-Train-7.0-LMT-Men-US-8.5-Black-Cross-Training%2F51844071%3Faffp1%3D-ByPQBinFWiAoQigU4w3RKPhjtrlGOUVONY8ulvvMN4%26affilsrc%3Dapi%26veh%3Daff%26wmlspartner%3Dreadonlyapi",
-						"title": "Show Item",
-						"webview_height_ratio": "compact",
-					}, {
-						"type": "web_url",
-						"title": "Add Cart",
-						"url": "http://c.affil.walmart.com/t/api02?l=http%3A%2F%2Faffil.walmart.com%2Fcart%2FaddToCart%3Fitems%3D51844071%7C1%26affp1%3D-ByPQBinFWiAoQigU4w3RKPhjtrlGOUVONY8ulvvMN4%26affilsrc%3Dapi%26veh%3Daff%26wmlspartner%3Dreadonlyapi",
-						"webview_height_ratio": "tall",
-					}],
-				}, {
-					"title": "Reebok Men's Yourflex Train 7.0 Lmt Training Shoe",
-					"subtitle": "41.11",
-					"image_url": "https://i5.walmartimages.com/asr/c2177e90-3024-4096-a602-3f7563f8c2c9_1.96d3442ce0884e313e06ded4787dea21.jpeg?odnHeight=100&odnWidth=100&odnBg=FFFFFF",
-					"buttons": [{
-						"type": "web_url",
-						"url": "http://c.affil.walmart.com/t/api02?l=http%3A%2F%2Fwww.walmart.com%2Fip%2FReebok-YourFlex-Train-7.0-LMT-Men-US-8.5-Black-Cross-Training%2F51844071%3Faffp1%3D-ByPQBinFWiAoQigU4w3RKPhjtrlGOUVONY8ulvvMN4%26affilsrc%3Dapi%26veh%3Daff%26wmlspartner%3Dreadonlyapi",
-						"title": "Show Item",
-						"webview_height_ratio": "compact",
-					}, {
-						"type": "web_url",
-						"title": "Add Cart",
-						"url": "http://c.affil.walmart.com/t/api02?l=http%3A%2F%2Faffil.walmart.com%2Fcart%2FaddToCart%3Fitems%3D51844071%7C1%26affp1%3D-ByPQBinFWiAoQigU4w3RKPhjtrlGOUVONY8ulvvMN4%26affilsrc%3Dapi%26veh%3Daff%26wmlspartner%3Dreadonlyapi",
-					    "webview_height_ratio": "tall",
-					}],
-				}]
-			},
-        }
+          attachment: {
+            type: 'template',
+            payload: {
+              template_type: 'generic',
+              elements: [{
+                title: 'Welcome to Account Linking',
+                image_url: FRONTEND_URL + '/static/linking.png',
+                buttons: [{
+                  type: 'account_link',
+                  url: FRONTEND_URL + '/static/index.html'
+                }]
+              }]
+            }
+          }
         }
       });
     session.endDialog(message);
